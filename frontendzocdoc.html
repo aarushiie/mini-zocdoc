@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mini Zocdoc</title>
+<style>
+/* BODY & GENERAL */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to right, #c9e0ff, #ffe0f0);
+    margin: 0;
+    padding: 20px;
+}
+
+h1 {
+    text-align: center;
+    color: #1a3c6e;
+    margin-bottom: 30px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+/* BUTTONS */
+button {
+    padding: 10px 15px;
+    margin: 5px;
+    cursor: pointer;
+    border: none;
+    border-radius: 12px;
+    font-weight: bold;
+    transition: 0.3s;
+    box-shadow: 2px 3px 8px rgba(0,0,0,0.2);
+}
+
+button:hover { transform: translateY(-2px); }
+
+input, select {
+    padding: 10px;
+    margin: 8px 0;
+    width: 100%;
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+/* CONTAINERS */
+.hidden { display: none; }
+
+.container {
+    max-width: 700px;
+    margin: 20px auto;
+    background: #fff;
+    padding: 25px;
+    border-radius: 20px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+}
+
+/* DOCTOR / APPOINTMENT CARDS */
+.doctor, .appointment {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    border-radius: 15px;
+    margin-bottom: 12px;
+    background: #f4f8ff;
+    transition: 0.3s;
+}
+
+.doctor:hover, .appointment:hover {
+    background: #e0f0ff;
+}
+
+/* SLOT STYLING */
+.available {
+    color: #fff;
+    background: #1a73e8; /* blue */
+    font-weight: bold;
+    margin-right: 5px;
+    padding: 5px 10px;
+    border-radius: 8px;
+    display: inline-block;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.available:hover { background: #155ab6; }
+
+.booked {
+    color: #fff;
+    background: #c2185b; /* dark pink */
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.cancelled {
+    color: #fff;
+    background: #e53935; /* red */
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+/* BUTTON COLORS */
+.btn-blue { background: #1a73e8; color: #fff; }
+.btn-blue:hover { background: #155ab6; }
+
+.btn-pink { background: #c2185b; color: #fff; }
+.btn-pink:hover { background: #9b1450; }
+
+h2 { color: #1a3c6e; margin-bottom: 15px; }
+h3 { color: #1a3c6e; margin-bottom: 10px; }
+
+</style>
+</head>
+<body>
+
+<h1>Mini Zocdoc</h1>
+
+<div class="container" id="userSelect">
+  <h2>Select User</h2>
+  <button class="btn-blue" onclick="showPatient()">Patient</button>
+  <button class="btn-pink" onclick="showDoctor()">Doctor</button>
+</div>
+
+<!-- PATIENT VIEW -->
+<div class="container hidden" id="patientView">
+  <h2>Patient Side</h2>
+  <div id="patientNameDiv">
+    <input type="text" id="patientName" placeholder="Enter your name">
+    <button class="btn-blue" onclick="setPatientName()">Submit</button>
+  </div>
+
+  <div id="patientMain" class="hidden">
+    <h3>Doctors</h3>
+    <div id="doctorList"></div>
+    <h3>Your Appointments</h3>
+    <div id="appointmentsList"></div>
+    <button class="btn-pink" onclick="backToMenu()">Back</button>
+  </div>
+</div>
+
+<!-- DOCTOR VIEW -->
+<div class="container hidden" id="doctorView">
+  <h2>Doctor Side</h2>
+  <h3>Doctor Earnings & Slots</h3>
+  <div id="doctorEarningsList"></div>
+  <button class="btn-blue" onclick="backToMenu()">Back</button>
+</div>
+
+<script>
+// Basic setup
+const FEE = 100;
+let patientNameGlobal = "";
+
+let doctors = [
+    {name: "Dr. Ayesha Khan", specialty: "Cardiologist", slots: ["10AM","2PM"], earnings: 0},
+    {name: "Dr. Ravi Singh", specialty: "Dermatologist", slots: ["11AM","4PM"], earnings: 0},
+    {name: "Dr. Meera Patel", specialty: "Dentist", slots: ["9AM","1PM"], earnings: 0}
+];
+
+let appointments = [];
+
+// USER FUNCTIONS
+function showPatient() {
+    document.getElementById('userSelect').classList.add('hidden');
+    document.getElementById('patientView').classList.remove('hidden');
+    document.getElementById('patientMain').classList.add('hidden');
+    document.getElementById('patientNameDiv').classList.remove('hidden');
+}
+
+function setPatientName() {
+    const name = document.getElementById('patientName').value.trim();
+    if(name === "") { alert("Enter your name!"); return; }
+    patientNameGlobal = name;
+    document.getElementById('patientNameDiv').classList.add('hidden');
+    document.getElementById('patientMain').classList.remove('hidden');
+    renderDoctors();
+    renderAppointments();
+}
+
+function showDoctor() {
+    document.getElementById('userSelect').classList.add('hidden');
+    document.getElementById('doctorView').classList.remove('hidden');
+    renderDoctorEarnings();
+}
+
+function backToMenu() {
+    document.getElementById('patientView').classList.add('hidden');
+    document.getElementById('doctorView').classList.add('hidden');
+    document.getElementById('userSelect').classList.remove('hidden');
+}
+
+// RENDER FUNCTIONS
+function renderDoctors() {
+    const container = document.getElementById('doctorList');
+    container.innerHTML = '';
+    doctors.forEach((doc, i) => {
+        const div = document.createElement('div');
+        div.className = 'doctor';
+        div.innerHTML = `<strong>${doc.name}</strong> (${doc.specialty})<br>Available slots: `;
+        doc.slots.forEach((slot,j) => {
+            const span = document.createElement('span');
+            span.className = 'available';
+            span.innerText = slot;
+            span.onclick = () => bookAppointment(i,j);
+            div.appendChild(span);
+        });
+        container.appendChild(div);
+    });
+}
+
+function bookAppointment(docIndex, slotIndex) {
+    appointments.push({patient: patientNameGlobal, docIndex, slot: doctors[docIndex].slots[slotIndex], booked:true, cancelled:false});
+    doctors[docIndex].slots.splice(slotIndex,1);
+    doctors[docIndex].earnings += FEE;
+    renderDoctors();
+    renderAppointments();
+    renderDoctorEarnings();
+}
+
+function renderAppointments() {
+    const container = document.getElementById('appointmentsList');
+    container.innerHTML = '';
+    appointments.forEach((a,i) => {
+        if(a.patient === patientNameGlobal){
+            const div = document.createElement('div');
+            div.className = 'appointment ' + (a.cancelled ? 'cancelled':'booked');
+            div.innerHTML = `Doctor: ${doctors[a.docIndex].name}, Slot: ${a.slot} 
+                ${!a.cancelled ? `<button class="btn-pink" onclick="cancelAppointment(${i})">Cancel</button>` : '(Cancelled)'}`;
+            container.appendChild(div);
+        }
+    });
+}
+
+function cancelAppointment(index) {
+    appointments[index].booked = false;
+    appointments[index].cancelled = true;
+    const docIndex = appointments[index].docIndex;
+    doctors[docIndex].slots.push(appointments[index].slot);
+    doctors[docIndex].earnings -= FEE;
+    renderDoctors();
+    renderAppointments();
+    renderDoctorEarnings();
+}
+
+function renderDoctorEarnings() {
+    const container = document.getElementById('doctorEarningsList');
+    container.innerHTML = '';
+    doctors.forEach(doc => {
+        const div = document.createElement('div');
+        div.className = 'doctor';
+        // Show cancelled slots in RED
+        let cancelledSlots = appointments.filter(a => a.docIndex===doctors.indexOf(doc) && a.cancelled).map(a=>a.slot);
+        div.innerHTML = `<strong>${doc.name}</strong> (${doc.specialty}) - Earnings: <span class="booked">₹${doc.earnings}</span><br>
+            Available slots: ${doc.slots.join(', ')}
+            ${cancelledSlots.length > 0 ? '<br>Cancelled slots: <span class="cancelled">' + cancelledSlots.join(', ') + '</span>':''}`;
+        container.appendChild(div);
+    });
+}
+</script>
+
+</body>
+</html>
