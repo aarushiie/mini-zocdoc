@@ -1,131 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <title>Zocdoc – BLACKPINK Edition</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
 
 <style>
-body {
-    margin: 0;
-    font-family: 'Poppins', sans-serif;
-    background: radial-gradient(circle at top, #1a1a1a, #000000);
-    color: #fff;
+body{
+    margin:0;
+    font-family:'Poppins',sans-serif;
+    background:radial-gradient(circle at top,#1a1a1a,#000);
+    color:#fff;
+}
+.hidden{display:none;}
+button{
+    border:none;
+    padding:8px 16px;
+    border-radius:20px;
+    cursor:pointer;
+    font-weight:bold;
+}
+button:hover{transform:scale(1.05);}
+.btn-blue{background:linear-gradient(135deg,#4facfe,#00f2fe);color:#000;}
+.btn-pink{background:linear-gradient(135deg,#ff2f92,#ff6ec7);color:#000;}
+
+header{
+    text-align:center;
+    padding:30px;
+}
+header h1{
+    font-size:42px;
+    letter-spacing:4px;
+    color:#ff2f92;
+}
+header p{color:#f5b7d2;}
+
+.container{
+    max-width:900px;
+    margin:30px auto;
+    background:#0f0f0f;
+    padding:30px;
+    border-radius:22px;
+    box-shadow:0 0 40px rgba(255,47,146,0.4);
 }
 
-/* HEADER */
-header {
-    text-align: center;
-    padding: 35px 20px;
+.card{
+    background:#1a1a1a;
+    padding:20px;
+    border-radius:18px;
+    margin-bottom:20px;
+    border:1px solid rgba(255,47,146,0.4);
 }
 
-header h1 {
-    font-size: 44px;
-    letter-spacing: 4px;
-    color: #ff2f92;
-    margin-bottom: 8px;
-}
+.card h2{color:#ff2f92;margin:0;}
+.specialty{color:#ffc1dd;font-size:14px;}
+.earnings{color:#4facfe;font-weight:bold;margin-top:5px;}
 
-header p {
-    color: #f5b7d2;
-    font-size: 15px;
+.slot{
+    margin-top:10px;
+    padding:8px 12px;
+    border-radius:14px;
+    display:inline-block;
+    margin-right:8px;
+    font-size:13px;
 }
+.available{background:#111;border:1px solid #4facfe;cursor:pointer;}
+.cancelled{background:#2a0000;border:1px solid red;color:#ff4d4d;font-weight:bold;}
 
-/* LAYOUT */
-.container {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 35px;
-    padding: 40px;
-}
-
-/* CARDS */
-.card {
-    background: linear-gradient(145deg, #0f0f0f, #1a1a1a);
-    width: 380px;
-    padding: 25px;
-    border-radius: 22px;
-    box-shadow: 0 0 35px rgba(255,47,146,0.4);
-    border: 1px solid rgba(255,47,146,0.4);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 0 55px rgba(255,47,146,0.7);
-}
-
-.card h2 {
-    margin: 0;
-    font-size: 24px;
-    color: #ff2f92;
-}
-
-.specialty {
-    font-size: 14px;
-    color: #ffc1dd;
-    margin-bottom: 10px;
-}
-
-.earnings {
-    font-weight: bold;
-    color: #4facfe;
-    margin-bottom: 10px;
-}
-
-/* SLOTS */
-.slot {
-    margin-top: 12px;
-    padding: 10px 14px;
-    border-radius: 14px;
-    font-size: 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.available {
-    background: #111;
-    border: 1px solid #4facfe;
-}
-
-.booked {
-    background: #2a0f1c;
-    border: 1px solid #ff2f92;
-}
-
-.cancelled {
-    background: #2a0000;
-    border: 1px solid red;
-    color: #ff4d4d;
-    font-weight: bold;
-}
-
-/* BUTTONS */
-button {
-    border: none;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: transform 0.2s;
-}
-
-button:hover {
-    transform: scale(1.05);
-}
-
-.book-btn {
-    background: linear-gradient(135deg, #4facfe, #00f2fe);
-    color: #000;
-    font-weight: bold;
-}
-
-.cancel-btn {
-    background: linear-gradient(135deg, #ff2f92, #ff6ec7);
-    color: #000;
-    font-weight: bold;
+input{
+    padding:10px;
+    width:100%;
+    border-radius:12px;
+    border:none;
+    margin-bottom:15px;
 }
 </style>
 </head>
@@ -134,83 +82,159 @@ button:hover {
 
 <header>
     <h1>ZOCDOC</h1>
-    <p>healthcare meets smartcare</p>
+    <p>Healthcare. But make it BLACKPINK 🖤💖</p>
 </header>
 
-<div class="container" id="app"></div>
+<!-- USER SELECT -->
+<div class="container" id="userSelect">
+    <h2>Select User</h2>
+    <button class="btn-blue" onclick="showPatient()">Patient</button>
+    <button class="btn-pink" onclick="showDoctor()">Doctor</button>
+</div>
+
+<!-- PATIENT -->
+<div class="container hidden" id="patientView">
+    <h2>Patient Panel</h2>
+
+    <div id="nameBox">
+        <input id="patientName" placeholder="Enter your name">
+        <button class="btn-blue" onclick="setPatient()">Continue</button>
+    </div>
+
+    <div id="patientMain" class="hidden">
+        <h3>Doctors</h3>
+        <div id="doctorList"></div>
+
+        <h3>Your Appointments</h3>
+        <div id="appointments"></div>
+
+        <button class="btn-pink" onclick="goBack()">Back</button>
+    </div>
+</div>
+
+<!-- DOCTOR -->
+<div class="container hidden" id="doctorView">
+    <h2>Doctor Dashboard</h2>
+    <div id="doctorDashboard"></div>
+    <button class="btn-blue" onclick="goBack()">Back</button>
+</div>
 
 <script>
-const doctors = [
-    {
-        name: "Dr. Sharma",
-        specialty: "Cardiologist",
-        earnings: 0,
-        slots: [
-            { time: "10:00 AM", status: "available" },
-            { time: "11:00 AM", status: "available" }
-        ]
-    },
-    {
-        name: "Dr. Mehta",
-        specialty: "Dermatologist",
-        earnings: 0,
-        slots: [
-            { time: "12:00 PM", status: "available" },
-            { time: "01:00 PM", status: "available" }
-        ]
-    }
+const BOOK_FEE = 500;
+const CANCEL_FINE = 200;
+
+let patientName = "";
+
+let doctors = [
+    {name:"Dr. Ayesha Khan",specialty:"Cardiologist",earnings:0,slots:["10AM","2PM"]},
+    {name:"Dr. Ravi Singh",specialty:"Dermatologist",earnings:0,slots:["11AM","4PM"]},
+    {name:"Dr. Meera Patel",specialty:"Dentist",earnings:0,slots:["9AM","1PM"]}
 ];
 
-function render() {
-    const app = document.getElementById("app");
-    app.innerHTML = "";
+let appointments = [];
 
-    doctors.forEach((doc, d) => {
-        let html = `
-        <div class="card">
-            <h2>${doc.name}</h2>
-            <div class="specialty">${doc.specialty}</div>
-            <div class="earnings">Earnings: ₹${doc.earnings}</div>
-            <hr style="border-color:#333;">
-        `;
+/* NAV */
+function showPatient(){
+    userSelect.classList.add("hidden");
+    patientView.classList.remove("hidden");
+}
+function showDoctor(){
+    userSelect.classList.add("hidden");
+    doctorView.classList.remove("hidden");
+    renderDoctorDashboard();
+}
+function goBack(){
+    patientView.classList.add("hidden");
+    doctorView.classList.add("hidden");
+    userSelect.classList.remove("hidden");
+}
 
-        doc.slots.forEach((slot, s) => {
-            html += `
-            <div class="slot ${slot.status}">
-                <span>${slot.time} — ${slot.status.toUpperCase()}</span>
-            `;
+/* PATIENT */
+function setPatient(){
+    patientName = patientNameInput();
+    if(!patientName) return alert("Enter name");
+    nameBox.classList.add("hidden");
+    patientMain.classList.remove("hidden");
+    renderDoctors();
+    renderAppointments();
+}
+function patientNameInput(){
+    return document.getElementById("patientName").value.trim();
+}
 
-            if (slot.status === "available") {
-                html += `<button class="book-btn" onclick="book(${d},${s})">Book</button>`;
-            }
-
-            if (slot.status === "booked") {
-                html += `<button class="cancel-btn" onclick="cancel(${d},${s})">Cancel</button>`;
-            }
-
-            html += `</div>`;
+function renderDoctors(){
+    doctorList.innerHTML="";
+    doctors.forEach((d,i)=>{
+        let div=document.createElement("div");
+        div.className="card";
+        div.innerHTML=`<h2>${d.name}</h2>
+        <div class="specialty">${d.specialty}</div>
+        <div class="earnings">Earnings: ₹${d.earnings}</div><br>`;
+        d.slots.forEach((s,j)=>{
+            let span=document.createElement("span");
+            span.className="slot available";
+            span.innerText=s;
+            span.onclick=()=>book(i,j);
+            div.appendChild(span);
         });
-
-        html += `</div>`;
-        app.innerHTML += html;
+        doctorList.appendChild(div);
     });
 }
 
-function book(d, s) {
-    doctors[d].slots[s].status = "booked";
-    doctors[d].earnings += 500;
-    render();
+function book(d,s){
+    appointments.push({patient:patientName,doc:d,slot:doctors[d].slots[s],cancelled:false});
+    doctors[d].slots.splice(s,1);
+    doctors[d].earnings+=BOOK_FEE;
+    renderDoctors();
+    renderAppointments();
 }
 
-function cancel(d, s) {
-    doctors[d].slots[s].status = "cancelled";
-    doctors[d].earnings -= 200;
-    render();
+function renderAppointments(){
+    const container=document.getElementById("appointments");
+    container.innerHTML="";
+    appointments.forEach((a,i)=>{
+        if(a.patient===patientName){
+            let div=document.createElement("div");
+            div.className="card";
+            div.innerHTML=`
+                ${doctors[a.doc].name} – ${a.slot}
+                ${!a.cancelled
+                    ? `<button class="btn-pink" onclick="cancel(${i})">Cancel</button>`
+                    : `<span class="cancelled">Cancelled</span>`
+                }
+            `;
+            container.appendChild(div);
+        }
+    });
 }
 
-render();
+function cancel(i){
+    appointments[i].cancelled=true;
+    doctors[appointments[i].doc].slots.push(appointments[i].slot);
+    doctors[appointments[i].doc].earnings-=CANCEL_FINE;
+    renderDoctors();
+    renderAppointments();
+    renderDoctorDashboard();
+}
+
+/* DOCTOR */
+function renderDoctorDashboard(){
+    doctorDashboard.innerHTML="";
+    doctors.forEach((d,idx)=>{
+        let cancelled=appointments.filter(a=>a.doc===idx && a.cancelled).map(a=>a.slot);
+        let div=document.createElement("div");
+        div.className="card";
+        div.innerHTML=`
+            <h2>${d.name}</h2>
+            <div class="specialty">${d.specialty}</div>
+            <div class="earnings">Earnings: ₹${d.earnings}</div>
+            <div>Available Slots: ${d.slots.join(", ")||"None"}</div>
+            ${cancelled.length?`<div class="cancelled">Cancelled: ${cancelled.join(", ")}</div>`:""}
+        `;
+        doctorDashboard.appendChild(div);
+    });
+}
 </script>
 
 </body>
 </html>
-
